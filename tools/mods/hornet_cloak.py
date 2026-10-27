@@ -15,7 +15,7 @@ The resulting mod contains modified game files - keep it for yourself, do not pu
   hornet_cloak.py preview <in.png> <out.png>
 
 Options: --hue 48 (target hue in degrees: 48 yellow, 120 green, 210 blue, 280 purple),
-         --brighten 0.25 (lifts dark shades so the colour does not turn brown), --match hornet
+         --saturate 0.7 --gain 1.5 --lift 0.2 (stronger, brighter colour than the muted original red)
 
 Requires: pip install UnityPy pillow numpy
 """
@@ -82,8 +82,10 @@ def red_weight(h, s, v, a, hue_range=22.0, soft=14.0, s_min=0.35, v_min=0.10):
     return w
 
 
-def recolor(img, hue=48.0, brighten=0.25):
+def recolor(img, hue=48.0, saturate=0.7, gain=1.5, lift=0.2):
     """Moves the reds of an RGBA image to `hue`; everything else stays as it is.
+    Hornet's cloak is a muted, dark burgundy (S ~0.47, V ~0.47, shadow V ~0.18): a plain hue swap
+    turns it khaki, so saturation is raised (s + (1-s)*saturate) and brightness remapped (v*gain + lift).
     Returns (new image, fraction of visible pixels that changed)."""
     arr = np.asarray(img.convert("RGBA")).astype(np.float64) / 255.0
     rgb, a = arr[..., :3], arr[..., 3]
@@ -91,8 +93,9 @@ def recolor(img, hue=48.0, brighten=0.25):
     w = red_weight(h, s, v, a)
     signed = ((h + 180) % 360) - 180  # -180..180 around red
     new_h = hue + signed * 0.5        # keep a little of the original variation
-    new_v = v + (1 - v) * brighten * w
-    out_rgb = hsv_to_rgb(new_h, s, new_v)
+    new_s = s + (1 - s) * saturate
+    new_v = np.clip(v * gain + lift, 0, 1)
+    out_rgb = hsv_to_rgb(new_h, new_s, new_v)
     blended = rgb * (1 - w[..., None]) + out_rgb * w[..., None]
     res = np.concatenate([blended, a[..., None]], axis=-1)
     res = (np.clip(res, 0, 1) * 255 + 0.5).astype(np.uint8)
@@ -132,6 +135,20 @@ def rel_of(root, path):
     return os.path.relpath(path, root).replace(os.sep, "/")
 
 
+def set_unity_version(root):
+    """Addressables bundles of the game have the Unity version stripped; take it from globalgamemanagers."""
+    import UnityPy
+    ggm = os.path.join(root, "Data", "globalgamemanagers")
+    if not os.path.isfile(ggm):
+        return
+    try:
+        version = list(UnityPy.load(ggm).files.values())[0].unity_version
+        UnityPy.config.FALLBACK_UNITY_VERSION = version.split("-")[0]
+        print("Unity version: %s" % version)
+    except Exception as e:
+        print("warning: cannot read the Unity version (%s)" % e)
+
+
 def load(path):
     import UnityPy
     try:
@@ -153,12 +170,16 @@ def container_of(env):
 
 def scan(args):
     root = os.path.abspath(args.romfs)
+    set_unity_version(root)
     os.makedirs(os.path.join(args.work, "previews"), exist_ok=True)
     if not os.path.isdir(os.path.join(root, "Data")):
         print("warning: %s has no Data/ folder - is this the RomFS root of the game?" % root)
     pattern = re.compile(args.match, re.I)
+    files_re = re.compile(args.files, re.I)
     cands = []
     for path in unity_files(root):
+        if not files_re.search(rel_of(root, path)):
+            continue
         env = load(path)
         if env is None:
             continue
@@ -176,7 +197,7 @@ def scan(args):
             except Exception as e:
                 print("  cannot read a texture in %s: %s" % (rel_of(root, path), e))
                 continue
-            new, score = recolor(img, args.hue, args.brighten)
+            new, score = recolor(img, args.hue, args.saturate, args.gain, args.lift)
             if score < args.min_score:
                 continue
             key = "%s#%d" % (rel_of(root, path), obj.path_id)
@@ -187,7 +208,7 @@ def scan(args):
                           "red": round(score, 4), "preview": prev, "select": True})
             print("  %-50s %5dx%-5d red %5.1f%%  %s" % (name[:50], img.width, img.height, score * 100, prev))
     with open(os.path.join(args.work, "candidates.json"), "w", encoding="utf-8") as f:
-        json.dump({"hue": args.hue, "brighten": args.brighten, "textures": cands}, f, indent=1, ensure_ascii=False)
+        json.dump({"hue": args.hue, "saturate": args.saturate, "gain": args.gain, "lift": args.lift, "textures": cands}, f, indent=1, ensure_ascii=False)
     print("%d textures with red found -> %s" % (len(cands), os.path.join(args.work, "candidates.json")))
     print("Check the previews; set \"select\": false for textures that are not Hornet, then run build.")
 
@@ -237,9 +258,11 @@ def patch_catalog_crc(root, out_romfs):
 def build(args):
     import zipfile
     root = os.path.abspath(args.romfs)
+    set_unity_version(root)
     meta = json.load(open(os.path.join(args.work, "candidates.json"), encoding="utf-8"))
-    hue = args.hue if args.hue is not None else meta.get("hue", 48)
-    brighten = args.brighten if args.brighten is not None else meta.get("brighten", 0.25)
+    opts = {k: (getattr(args, k) if getattr(args, k) is not None else meta.get(k, d))
+            for k, d in (("hue", 48.0), ("saturate", 0.7), ("gain", 1.5), ("lift", 0.2))}
+    hue = opts["hue"]
     chosen = [t for t in meta["textures"] if t.get("select")]
     if not chosen:
         sys.exit("nothing selected in candidates.json")
@@ -254,13 +277,14 @@ def build(args):
             if obj.path_id not in ids:
                 continue
             tex = obj.read()
-            new, _ = recolor(tex.image, hue, brighten)
+            new, _ = recolor(tex.image, **opts)
             tex.image = new
             tex.save()
             done += 1
         dst = os.path.join(out_romfs, rel)
         os.makedirs(os.path.dirname(dst), exist_ok=True)
-        data = env.file.save(packer="lz4") if hasattr(env.file, "signature") else env.file.save()
+        # keep the original compression and block flags (incl. the alignment flag Unity uses on Switch)
+        data = env.file.save(packer="original") if hasattr(env.file, "signature") else env.file.save()
         with open(dst, "wb") as f:
             f.write(data)
         print("  %s: %d textures recoloured (%d MB)" % (rel, done, len(data) // (1024 * 1024)))
@@ -283,7 +307,7 @@ def build(args):
 
 def preview(args):
     img = Image.open(args.input)
-    new, score = recolor(img, args.hue, args.brighten)
+    new, score = recolor(img, args.hue, args.saturate, args.gain, args.lift)
     side_by_side(img, new, 1024).save(args.output)
     print("red pixels: %.1f%% -> %s" % (score * 100, args.output))
 
@@ -296,20 +320,27 @@ def main():
     s.add_argument("work")
     s.add_argument("--match", default="hornet")
     s.add_argument("--all", action="store_true", help="look at every texture, not only names matching --match")
+    s.add_argument("--files", default="herocollections_|hornet", help="only Unity files whose path matches (default: Hornet's sprite collections)")
     s.add_argument("--min-score", type=float, default=0.01)
     s.add_argument("--hue", type=float, default=48.0)
-    s.add_argument("--brighten", type=float, default=0.25)
+    s.add_argument("--saturate", type=float, default=0.7)
+    s.add_argument("--gain", type=float, default=1.5)
+    s.add_argument("--lift", type=float, default=0.2)
     b = sub.add_parser("build")
     b.add_argument("romfs")
     b.add_argument("work")
     b.add_argument("--out", default="hornet-cloak.zip")
     b.add_argument("--hue", type=float)
-    b.add_argument("--brighten", type=float)
+    b.add_argument("--saturate", type=float)
+    b.add_argument("--gain", type=float)
+    b.add_argument("--lift", type=float)
     p = sub.add_parser("preview")
     p.add_argument("input")
     p.add_argument("output")
     p.add_argument("--hue", type=float, default=48.0)
-    p.add_argument("--brighten", type=float, default=0.25)
+    p.add_argument("--saturate", type=float, default=0.7)
+    p.add_argument("--gain", type=float, default=1.5)
+    p.add_argument("--lift", type=float, default=0.2)
     args = ap.parse_args()
     {"scan": scan, "build": build, "preview": preview}[args.cmd](args)
 
