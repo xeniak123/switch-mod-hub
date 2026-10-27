@@ -1,0 +1,23 @@
+{
+  "format": 1,
+  "updated": "2026-10-27",
+  "mods": [
+    {
+      "id": "example-hello",
+      "name": "Przykładowy mod (test)",
+      "version": "1.0.0",
+      "author": "xeniak123",
+      "game": "Hollow Knight: Silksong",
+      "gameMatch": "Silksong",
+      "type": "romfs",
+      "description": "Testowy mod: dodaje do romfs gry jeden plik tekstowy, którego gra nie czyta – niczego nie zmienia w rozgrywce. Służy do sprawdzenia, czy pobieranie, włączanie i wyłączanie modów działa.",
+      "tags": [
+        "test",
+        "przykład"
+      ],
+      "url": "https://raw.githubusercontent.com/xeniak123/switch-mod-hub/main/mods/files/example-hello-1.0.0.zip",
+      "sha256": "154a5827befb77d1940da71418b8510c9066bbca3f2ffcc2cf5dcbc601133fdb",
+      "size": 496
+    }
+  ]
+}

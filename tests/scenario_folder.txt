@@ -1,0 +1,50 @@
+# Scenario 2: folder backup -> quick toggles, revert, bulk action -> overwrite
+frames 2
+# since 2.0.0 the app starts on Home: open Hollow Knight: Silksong (first game)
+press A
+press A
+press A
+frames 3
+press DOWN
+press DOWN
+press DOWN
+press DOWN
+press DOWN
+press DOWN
+press DOWN
+press DOWN
+press DOWN
+press DOWN
+press DOWN
+press DOWN
+press DOWN
+press DOWN
+# one more row since 1.1.0: the Steel Soul mode row
+shot 30_quick_toggles
+press A
+press DOWN
+press RIGHT
+shot 31_toggled
+press X
+shot 32_reverted
+hold DOWN 40
+shot 33_quick_scrolled
+press ZR
+shot 34_quick_page
+press R
+press R
+press A
+shot 35_confirm_health
+press A
+press PLUS
+press DOWN
+press A
+shot 36_overwrite_confirm
+press UP
+press A
+frames 3
+shot 37_overwrite_done
+press A
+press B
+press B
+press PLUS

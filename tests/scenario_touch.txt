@@ -1,0 +1,31 @@
+# Scenario 11: touch screen - select / open by tapping, value arrows, drag to scroll, tab tap
+frames 2
+# Home: the first game is selected, tapping it opens it
+tap 400 182
+frames 3
+# game screen (rows start below the tab bar): select the ZIP backup, tap again to open
+tap 400 248
+shot 100_touch_select
+tap 400 248
+frames 3
+shot 101_touch_files
+tap 400 134
+frames 3
+tap 300 348
+tap 810 348
+tap 810 348
+shot 102_touch_geo
+drag 300 500 -300 10
+shot 103_touch_drag
+tap 1000 113
+shot 104_touch_changes
+press PLUS
+tap 640 5
+shot 105_touch_menu_closed
+press PLUS
+press A
+frames 3
+tap 640 360
+press B
+frames 3
+press PLUS

@@ -1,0 +1,7 @@
+# Scenario 4: a console without games, saves and JKSV backups
+frames 2
+shot 50_no_games
+press R
+frames 3
+shot 51_repo_offline
+press PLUS

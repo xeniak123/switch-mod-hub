@@ -1,0 +1,13 @@
+build/
+overlay/build/
+*.elf
+*.nacp
+*.nro
+*.nso
+*.ovl
+*.pfs0
+*.lst
+*.map
+dist/
+tests/out/
+__pycache__/

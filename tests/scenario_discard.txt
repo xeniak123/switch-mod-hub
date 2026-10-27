@@ -1,0 +1,36 @@
+# Scenario 3: leave without saving, cancelled keyboard, a binary file of another game
+frames 2
+press A
+press DOWN
+press A
+press A
+frames 3
+press DOWN
+press DOWN
+press DOWN
+text <cancel>
+press A
+hold RIGHT 200
+shot 40_geo_accelerated
+press B
+shot 41_unsaved_confirm
+press UP
+press A
+shot 42_back_to_files
+press B
+press B
+press DOWN
+press A
+press A
+press A
+frames 3
+# File1.bin of Super Mario Odyssey is not JSON: it opens in the hex editor
+shot 43_binary_hex
+press B
+frames 3
+press B
+press B
+press MINUS
+shot 44_help_titles
+press B
+press PLUS

@@ -1,0 +1,19 @@
+# Scenario 16: self update from a (fake) GitHub release
+frames 3
+shot 160_update_available
+press B
+press X
+press DOWN
+press DOWN
+press A
+press DOWN
+press DOWN
+press DOWN
+shot 161_menu_autoupdate_off
+press A
+frames 3
+shot 162_update_check
+press A
+frames 3
+shot 163_updated
+press A

@@ -1,0 +1,22 @@
+# Rendering cost per frame of the heaviest screens (run with an -O2 build without sanitizers)
+frames 2
+# since 2.0.0 the app starts on Home: open Hollow Knight: Silksong (first game)
+press A
+bench 300 backups
+press A
+press A
+frames 3
+bench 300 quick
+press R
+press A
+bench 300 tree
+press R
+bench 300 actions
+press MINUS
+bench 300 help
+press B
+press PLUS
+bench 300 save_menu
+press B
+press B
+press PLUS

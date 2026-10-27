@@ -1,0 +1,33 @@
+# Scenario 10: export the edited save in the PC format
+frames 2
+# since 2.0.0 the app starts on Home: open Hollow Knight: Silksong (first game)
+press A
+press A
+press A
+frames 3
+press DOWN
+press DOWN
+press DOWN
+text 4242
+press A
+press R
+press R
+press DOWN
+press DOWN
+press DOWN
+press DOWN
+press DOWN
+press DOWN
+press DOWN
+press DOWN
+press DOWN
+press DOWN
+press A
+frames 2
+shot 95_exported
+press A
+press B
+press UP
+press A
+frames 3
+press PLUS

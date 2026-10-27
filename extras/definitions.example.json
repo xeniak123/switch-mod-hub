@@ -1,0 +1,14 @@
+{
+  "tools": [
+    {"name": "Internal Tool Name", "display": "In-game tool name", "amount": 0, "hidden": false}
+  ],
+  "crests": [
+    {"name": "InternalCrestName", "display": "In-game crest name", "slots": 6}
+  ],
+  "bosses": [
+    {"key": "defeatedSomeNewBoss", "label": "New boss"}
+  ],
+  "names": {
+    "Some Internal Name": "Its in-game name"
+  }
+}

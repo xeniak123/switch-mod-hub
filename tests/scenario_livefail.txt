@@ -1,0 +1,23 @@
+# Scenario 7: the commit of the game save fails - nothing may change
+frames 2
+# since 2.0.0 the app starts on Home: open Hollow Knight: Silksong (first game)
+press A
+press A
+press A
+frames 3
+press DOWN
+press DOWN
+press DOWN
+text 5555
+press A
+press PLUS
+press A
+press A
+frames 3
+shot 85_commit_failed
+press A
+press B
+press UP
+press A
+frames 3
+press PLUS

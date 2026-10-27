@@ -1,0 +1,18 @@
+# Scenario 13: the editor's safety copies (after an overwrite) - open, delete
+frames 2
+press DOWN
+press DOWN
+press DOWN
+shot 120_titles_with_safety
+press A
+shot 121_safety_list
+press A
+shot 122_safety_files
+press B
+press X
+shot 123_safety_menu
+press A
+press UP
+press A
+shot 124_safety_deleted
+press PLUS

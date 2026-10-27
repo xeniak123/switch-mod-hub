@@ -1,0 +1,36 @@
+# Scenario 9: import a PC save (encrypted) into user2.dat of a ZIP backup, save as new
+frames 2
+# since 2.0.0 the app starts on Home: open Hollow Knight: Silksong (first game)
+press A
+press DOWN
+press A
+press DOWN
+press A
+frames 3
+press R
+press R
+press DOWN
+press DOWN
+press DOWN
+press DOWN
+press DOWN
+press DOWN
+press DOWN
+press DOWN
+press DOWN
+shot 90_actions_import
+press A
+shot 91_import_menu
+press A
+shot 92_import_confirm
+press A
+press R
+shot 93_import_changes
+press PLUS
+press A
+frames 3
+shot 94_import_saved
+press A
+press B
+frames 3
+press PLUS
