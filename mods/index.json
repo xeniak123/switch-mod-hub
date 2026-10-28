@@ -1,7 +1,27 @@
 {
   "format": 1,
-  "updated": "2026-10-27",
+  "updated": "2026-10-28",
   "mods": [
+    {
+      "id": "silksong-dev-menu",
+      "name": "Menu deweloperskie + noclip",
+      "version": "1.0.0",
+      "author": "xeniak123",
+      "game": "Hollow Knight: Silksong",
+      "titleId": "010013C00E930000",
+      "type": "exefs",
+      "description": "Odblokowuje ukryte menu deweloperskie Team Cherry (jest w grze, ale wyłączone). Otwórz je, przytrzymując obie gałki wciśnięte (L3 + R3) przez ok. 5 sekund. Opcja „Noclip” pozwala przechodzić przez ściany, drzwi i zamknięte bramy (włącza też nieśmiertelność i nieskończony podwójny skok). Tylko dla wersji 1.0 bez aktualizacji (build 9049EA1C).",
+      "tags": [
+        "cheat",
+        "noclip",
+        "debug",
+        "menu deweloperskie"
+      ],
+      "gameVersion": "1.0 (build 9049EA1C527A35D7)",
+      "url": "https://raw.githubusercontent.com/xeniak123/switch-mod-hub/main/mods/files/silksong-dev-menu-1.0.0.zip",
+      "sha256": "e5c8ae84413b26e4d24a13cb403332fcf5d057f0e204e4da8f1938b5c07082d4",
+      "size": 628
+    },
     {
       "id": "example-hello",
       "name": "Przykładowy mod (test)",
