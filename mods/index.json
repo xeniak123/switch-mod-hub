@@ -1,7 +1,27 @@
 {
   "format": 1,
-  "updated": "2026-10-28",
+  "updated": "2026-10-30",
   "mods": [
+    {
+      "id": "silksong-health-overlay",
+      "name": "Silksong: HP + obrażenia (EKSPERYMENTALNY)",
+      "version": "0.1.0",
+      "author": "xeniak123",
+      "game": "Hollow Knight: Silksong",
+      "titleId": "010013C00E930000",
+      "type": "exefs",
+      "description": "Eksperymentalna natywna nakładka HP przeciwników i obrażeń. Tylko baza v0, build 9049EA1C527A35D7. Sprawdzona statycznie i w testach ARM64, jeszcze bez testu na konsoli. Inspiracja: ShowDamage HealthBar — Xiaohai; niezależny kod, bez zasobów oryginału.",
+      "tags": [
+        "HP",
+        "obrażenia",
+        "UI",
+        "eksperymentalny"
+      ],
+      "gameVersion": "1.0 (baza v0, build 9049EA1C527A35D7; bez aktualizacji)",
+      "url": "https://raw.githubusercontent.com/xeniak123/switch-mod-hub/main/mods/files/silksong-health-overlay-0.1.0.zip",
+      "sha256": "86c60c4bbc4ca1faf1ce93f3a000042e6a92f33f5daf61cd33e6b888859a8c1b",
+      "size": 3958
+    },
     {
       "id": "silksong-dev-menu",
       "name": "Menu deweloperskie + noclip",

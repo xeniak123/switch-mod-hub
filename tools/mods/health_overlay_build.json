@@ -1,0 +1,39 @@
+{
+  "address": 100913776,
+  "sha256": "c1dbe1b3232e5bc7e1d8d8a6ca8b5556dcba1c47ec5009a7b2035c9fb76fc9a0",
+  "sources": {
+    "health_overlay.c": "fcf9d2b7449a1fa7b79778ba320938b914a14d0cc8787fe3e49946898f05c96b",
+    "health_overlay.ld": "17614a51d2ad3e5fa7764ed52c7f01e4639c829d352941510b38004cdf256e1b"
+  },
+  "symbols": {
+    "box": 100915396,
+    "label": 100915492,
+    "damage_hook": 100913776,
+    "original_damage": 100917232,
+    "game_time": 95960080,
+    "gui_hook": 100913892,
+    "original_gui": 100917240,
+    "event_current": 96258160,
+    "event_type": 96252608,
+    "active_enemies": 36801680,
+    "main_camera": 95277936,
+    "screen_width": 95366400,
+    "screen_height": 95366496,
+    "gui_color": 96271296,
+    "gui_skin": 96279696,
+    "skin_label": 96281424,
+    "style_font": 96398432,
+    "style_alignment": 96394464,
+    "set_style_font": 96398752,
+    "set_style_alignment": 96394784,
+    "white_texture": 95654064,
+    "behaviour_active": 95834464,
+    "component_transform": 95837696,
+    "transform_position": 95985760,
+    "world_to_screen": 95272672,
+    "gui_set_color": 96271616,
+    "gui_texture": 96284096,
+    "string_ascii": 81238944,
+    "gui_label": 96282064
+  }
+}

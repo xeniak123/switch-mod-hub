@@ -17,6 +17,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: python3 tools/validate_index.py mods/index.json
+      - name: Check native health overlay (ARM64 with engine stubs)
+        run: |
+          python3 -m pip install unicorn==2.1.4
+          python3 tests/test_health_overlay.py
 
   build:
     name: Switch build (.nro + .ovl)

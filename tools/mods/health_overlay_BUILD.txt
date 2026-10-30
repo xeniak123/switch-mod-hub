@@ -1,0 +1,63 @@
+Native HP/damage overlay — development notes
+
+Status: EXPERIMENTAL. No real Switch/gameplay validation yet.
+The ten ARM64 tests execute the compiled payload with engine stubs, not Unity.
+
+Sources: health_overlay.c and health_overlay.ld. License: repository GPL-2.0.
+No Nexus implementation or assets copied. Functional inspiration: Xiaohai's
+ShowDamage HealthBar (Nexus Silksong mod 28). This is an independent subset.
+
+Rebuild from repo root (tested with Zig 0.16.0, Python 3.14):
+  python -m pip install pyelftools unicorn==2.1.4 lz4
+  zig cc -target aarch64-freestanding-none -Oz -ffreestanding -fno-stack-protector -fno-unwind-tables -fno-asynchronous-unwind-tables -c tools/mods/health_overlay.c -o overlay.o
+  zig ld.lld -T tools/mods/health_overlay.ld overlay.o -o overlay.elf
+  python tools/mods/rebuild_health_overlay.py overlay.elf
+  python tests/test_health_overlay.py
+  python tools/mods/silksong_health_overlay.py mods/files/silksong-health-overlay-0.1.0.zip --check "PATH/TO/YOUR/ExeFS/main"
+  python tools/validate_index.py mods/index.json
+After any rebuild, update the catalog size and SHA-256. Do not commit game dumps,
+dump.cs, DummyDll, metadata, or a modified complete main.
+
+The final 0xd94 bytes of the mapped executable page are unused loader padding.
+Payload starts at RVA 0x603d270. Trampolines occupy 0x603dff0..0x603dfff.
+Atmosphere loader zeroes padding BEFORE IPS patches, then maps the whole text
+page executable. See Atmosphere stratosphere/loader/source/ldr_process_creation.cpp
+(LoadAutoLoadModule) and ldr_patcher.cpp (protected offset = 0x100).
+https://github.com/Atmosphere-NX/Atmosphere/blob/master/stratosphere/loader/source/ldr_process_creation.cpp
+
+Only three original instructions change:
+  HealthManager.TakeDamage entry 0x231bba0 -> damage_hook (original stp d15,d14
+  replayed in trampoline, continuation 0x231bba4).
+  GUIDrawer.OnGUI entry 0x2811990 -> gui_hook (original sub sp,sp,#0x70
+  replayed in trampoline, continuation 0x2811994).
+  GUIDrawer.ToggleDrawer 0x2811614 -> mov w19,#1. Keeps the GUI component
+  enabled after other drawers unregister; its normal drawers still run.
+Branches and constant loads are position-relative; no hardcoded runtime base.
+
+HealthManager fields: hp 0xa8; sendDamageTo 0xd8; isDead 0x1d9;
+initHp 0x2ac; hasTakenDamage 0x2b0. HitInstance.IsHeroDamage 0xae.
+The serialized deprecated fields ignoreHazards at 0x1d0 (plus padding) and
+invulnerableTime at 0x1d4 store a tagged actual-damage integer and game timestamp.
+No native field accesses in the entire HealthManager method range
+0x2316a20..0x2322c70 (plus constructor tail) use these slots. No pointers are
+retained, no heap tracker is injected, no save data is modified. The tag avoids
+treating serialized bool/timer defaults as a hit; hasTakenDamage suppresses
+objects reset by the game's pool. Other mods MUST NOT reuse these fields.
+
+Native ABI was checked against the input binary for GUI.DrawTexture, camera
+WorldToScreenPoint, System.String.Ctor(sbyte*,int,int), and both prologues.
+HealthManager.EnumerateActiveEnemies returns its backing List<HealthManager>.
+List layout: _items 0x10, _size 0x18; array elements begin at 0x20.
+No game binary, generated game assembly or proprietary decompiled source ships.
+
+Tests cover: ASLR at two bases, original-call forwarding and stack balance,
+actual damage, invulnerability/no change, non-hero hits, redirected targets,
+timers, large HP bars, dead/inactive/reset objects, Repaint-only rendering,
+source/payload hashes, branch destinations and payload limits.
+
+Required console checks before calling this stable:
+- Game starts; title/build match; normal enemy first/last hit and invulnerability.
+- Docked/handheld text, pause/resume, GUI state, scene changes and pooled enemies.
+- Boss transitions, multiple targets and HP scaling; slowdowns during crowds.
+- Import/enable/disable using Hub and restore after a full game restart.
+- Coexistence with other IPS mods: Hub detects files, not overlapping addresses.
